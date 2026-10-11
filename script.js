@@ -1,4 +1,4 @@
-const ADMIN_PASSWORD = "1234"; 
+const ADMIN_PASSWORD = "135246"; 
 
 const searchInput = document.getElementById('searchInput');
 const tabButtons = document.querySelectorAll('.tab-btn');
