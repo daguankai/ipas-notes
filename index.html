@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPAS 與程式技術重點筆記平台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header 區塊 -->
+    <header class="header">
+        <div class="header-content">
+            <h1>iPAS 與程式技術重點筆記</h1>
+            <p>核心考點與程式語法快速查詢與管理專區</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜尋關鍵字（例如：演算法、Python、HTML...）">
+            </div>
+            <!-- 管理員解鎖與備份/還原按鈕區 -->
+            <div class="admin-control-bar">
+                <button id="adminLoginBtn" class="admin-btn">🔑 解鎖管理功能</button>
+                <span id="adminStatus" class="admin-status hidden">目前狀態：已解鎖管理模式</span>
+                <button id="exportJsonBtn" class="export-btn hidden">📥 匯出備份 JSON</button>
+                <button id="importJsonBtn" class="import-btn hidden">📤 匯入還原 JSON</button>
+                <!-- 隱藏的檔案上傳 input -->
+                <input type="file" id="importFile" accept=".json" class="hidden">
+            </div>
+        </div>
+    </header>
+
+    <!-- 分類大欄位按鈕區 -->
+    <nav class="category-nav">
+        <button class="tab-btn active" data-category="all">全部顯示</button>
+        <!-- iPAS 考科 -->
+        <button class="tab-btn" data-category="l1-ai-basic">初級：人工智慧基礎概論</button>
+        <button class="tab-btn" data-category="l1-gen-ai">初級：生成式AI應用與規劃</button>
+        <button class="tab-btn" data-category="l2-ml-tech">中級：機器學習技術與應用</button>
+        <button class="tab-btn" data-category="l2-big-data">中級：大數據處理分析與應用</button>
+        <button class="tab-btn" data-category="l2-ai-plan">中級：人工智慧技術應用規劃</button>
+        <!-- 程式語言 -->
+        <button class="tab-btn" data-category="lang-html">HTML</button>
+        <button class="tab-btn" data-category="lang-css">CSS</button>
+        <button class="tab-btn" data-category="lang-js">JavaScript</button>
+        <button class="tab-btn" data-category="lang-python">Python</button>
+        <button class="tab-btn" data-category="lang-java">JAVA</button>
+    </nav>
+
+    <!-- 新增筆記表單區塊（預設隱藏，解鎖後顯示） -->
+    <section class="form-section hidden" id="formSection">
+        <details>
+            <summary class="toggle-form-btn">➕ 點此新增自定義筆記卡片</summary>
+            <form id="noteForm" class="note-form">
+                <h3>建立新考點或語法筆記</h3>
+                <div class="form-group">
+                    <label>筆記標題：</label>
+                    <input type="text" id="newTitle" required placeholder="例如：Python 基礎語法重點">
+                </div>
+                <div class="form-group">
+                    <label>選擇分類：</label>
+                    <select id="newCategory">
+                        <optgroup label="iPAS 考試科目">
+                            <option value="l1-ai-basic">初級：人工智慧基礎概論</option>
+                            <option value="l1-gen-ai">初級：生成式AI應用與規劃</option>
+                            <option value="l2-ml-tech">中級：機器學習技術與應用</option>
+                            <option value="l2-big-data">中級：大數據處理分析與應用</option>
+                            <option value="l2-ai-plan">中級：人工智慧技術應用規劃</option>
+                        </optgroup>
+                        <optgroup label="程式語言">
+                            <option value="lang-html">HTML</option>
+                            <option value="lang-css">CSS</option>
+                            <option value="lang-js">JavaScript</option>
+                            <option value="lang-python">Python</option>
+                            <option value="lang-java">JAVA</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>標籤名稱：</label>
+                    <input type="text" id="newTag" required placeholder="例如：#Python">
+                </div>
+                <div class="form-group">
+                    <label>詳細內容（支援分行、空格與排版）：</label>
+                    <textarea id="newContent" rows="5" required placeholder="輸入完整的複習重點..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">儲存卡片</button>
+            </form>
+        </details>
+    </section>
+
+    <!-- Main 區塊 -->
+    <main class="main-container">
+        <div class="card-container" id="cardContainer">
+            <!-- 筆記卡片動態載入 -->
+        </div>
+    </main>
+
+    <!-- 編輯專用彈跳視窗 (Modal) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>編輯筆記卡片</h3>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>筆記標題：</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>選擇分類：</label>
+                    <select id="editCategory">
+                        <optgroup label="iPAS 考試科目">
+                            <option value="l1-ai-basic">初級：人工智慧基礎概論</option>
+                            <option value="l1-gen-ai">初級：生成式AI應用與規劃</option>
+                            <option value="l2-ml-tech">中級：機器學習技術與應用</option>
+                            <option value="l2-big-data">中級：大數據處理分析與應用</option>
+                            <option value="l2-ai-plan">中級：人工智慧技術應用規劃</option>
+                        </optgroup>
+                        <optgroup label="程式語言">
+                            <option value="lang-html">HTML</option>
+                            <option value="lang-css">CSS</option>
+                            <option value="lang-js">JavaScript</option>
+                            <option value="lang-python">Python</option>
+                            <option value="lang-java">JAVA</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>標籤名稱：</label>
+                    <input type="text" id="editTag" required>
+                </div>
+                <div class="form-group">
+                    <label>詳細內容（支援分行與空格）：</label>
+                    <textarea id="editContent" rows="6" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelEditBtn" class="cancel-btn">取消</button>
+                    <button type="submit" class="submit-btn">確認修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
