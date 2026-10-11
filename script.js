@@ -1,4 +1,4 @@
-const ADMIN_PASSWORD = "135246"; 
+const ADMIN_PASSWORD = "1234"; 
 
 const searchInput = document.getElementById('searchInput');
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -18,24 +18,36 @@ const cancelEditBtn = document.getElementById('cancelEditBtn');
 const editIdInput = document.getElementById('editId');
 const editTitleInput = document.getElementById('editTitle');
 const editCategorySelect = document.getElementById('editCategory');
-const editTagInput = document.getElementById('editTag');
 
-// 初始化 Summernote 編輯器設定
+const categoryNames = {
+    'l1-ai-basic': '初級：人工智慧基礎概論',
+    'l1-gen-ai': '初級：生成式AI應用與規劃',
+    'l1-sec-mgmt': '初級：資訊安全管理概論',
+    'l1-sec-tech': '初級：資訊安全技術概論',
+    'l2-ml-tech': '中級：機器學習技術與應用',
+    'l2-big-data': '中級：大數據處理分析與應用',
+    'l2-ai-plan': '中級：人工智慧技術應用規劃',
+    'lang-html': 'HTML',
+    'lang-css': 'CSS',
+    'lang-js': 'JavaScript',
+    'lang-python': 'Python',
+    'lang-java': 'JAVA'
+};
+
 const summernoteOptions = {
-    height: 200,
-    lang: 'zh-TW', // 繁體中文介面
+    height: 220,
+    lang: 'zh-TW',
     toolbar: [
         ['style', ['style']],
         ['font', ['bold', 'italic', 'underline', 'clear']],
         ['color', ['color']],
         ['para', ['ul', 'ol', 'paragraph']],
-        ['table', ['table']], // ⬅️ 這裡有非常直覺的表格下拉按鈕！
+        ['table', ['table']],
         ['insert', ['link']],
         ['view', ['codeview']]
     ]
 };
 
-// 頁面載入完成後綁定 Summernote
 $(document).ready(function() {$('#newEditor').summernote(summernoteOptions);
     $('#editEditor').summernote(summernoteOptions);
     
@@ -46,32 +58,27 @@ $(document).ready(function() {$('#newEditor').summernote(summernoteOptions);
 let currentCategory = 'all';
 let isAdminUnlocked = false;
 
-// 預設示範筆記
 const defaultNotes = [
     {
         id: '1',
         category: 'l1-ai-basic',
-        title: '初級：鑑別式與生成式AI',
-        tag: '#AI基礎',
-        content: '<p>• <strong>鑑別式AI</strong>：辨識與分類現有資料。</p><p>• <span style="color: rgb(230, 0, 0);">生成式AI</span>：學習資料分佈以創造新資料。</p>'
+        title: '初級：鑑別式與生成式 AI 核心概念',
+        content: '<p>• <strong>鑑別式AI</strong>：辨識與分類現有資料。</p><p>• <span style="color: rgb(2, 132, 199);">生成式AI</span>：學習資料分佈以創造新資料。</p>'
     },
     {
         id: '2',
         category: 'l1-sec-mgmt',
-        title: '初級：資訊安全管理概論範例',
-        tag: '#資安管理',
-        content: '<p>• <strong>CIA 三要素</strong>：機密性、完整性、可用性。</p>'
+        title: '初級：資訊安全管理概論 (CIA 三要素)',
+        content: '<p>• <strong>機密性 (Confidentiality)</strong>：確保資料僅供授權人員存取。</p><p>• <strong>完整性 (Integrity)</strong>：確保資料未被未授權竄改。</p>'
     },
     {
         id: '3',
         category: 'lang-python',
-        title: 'Python 基礎語法範例',
-        tag: '#Python',
-        content: '<p>變數宣告與輸出：</p><pre style="background:#f4f4f4; padding:5px;">name = "Chih-Kai"<br>print(f"Hello, {name}")</pre>'
+        title: 'Python 基礎變數與輸出範例',
+        content: '<p>變數宣告與字串格式化輸出：</p><pre style="background:#f1f5f9; padding:8px; border-radius:6px;">name = "Chih-Kai"<br>print(f"Hello, {name}")</pre>'
     }
 ];
 
-// 管理員解鎖
 adminLoginBtn.addEventListener('click', () => {
     if (!isAdminUnlocked) {
         const pwd = prompt("請輸入管理者密碼以解鎖編輯/新增與備份還原功能：");
@@ -82,7 +89,7 @@ adminLoginBtn.addEventListener('click', () => {
             exportJsonBtn.classList.remove('hidden');
             importJsonBtn.classList.remove('hidden');
             formSection.classList.remove('hidden');
-            alert("解鎖成功！現在可以解鎖全新表格編輯器功能。");
+            alert("解鎖成功！");
             loadNotes(); 
         } else if (pwd !== null) {
             alert("密碼錯誤！");
@@ -90,7 +97,6 @@ adminLoginBtn.addEventListener('click', () => {
     }
 });
 
-// 📥 匯出 JSON
 exportJsonBtn.addEventListener('click', () => {
     const notesData = localStorage.getItem('ipas_notes');
     if (!notesData) return;
@@ -105,7 +111,6 @@ exportJsonBtn.addEventListener('click', () => {
     URL.revokeObjectURL(url);
 });
 
-// 📤 匯入 JSON
 importJsonBtn.addEventListener('click', () => importFile.click());
 
 importFile.addEventListener('change', (e) => {
@@ -129,7 +134,6 @@ importFile.addEventListener('change', (e) => {
     reader.readAsText(file);
 });
 
-// 卡片事件委派
 cardContainer.addEventListener('click', (e) => {
     const target = e.target;
     const card = target.closest('.card');
@@ -144,10 +148,8 @@ cardContainer.addEventListener('click', (e) => {
         navigator.clipboard.writeText(textToCopy).then(() => {
             const originalText = target.textContent;
             target.textContent = '已複製！';
-            target.classList.add('copied');
             setTimeout(() => {
                 target.textContent = originalText;
-                target.classList.remove('copied');
             }, 1500);
         });
     }
@@ -169,7 +171,6 @@ cardContainer.addEventListener('click', (e) => {
     }
 });
 
-// 分類與搜尋
 tabButtons.forEach(button => {
     button.addEventListener('click', () => {
         tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -181,32 +182,28 @@ tabButtons.forEach(button => {
 
 searchInput.addEventListener('input', () => filterAndRender());
 
-// 新增表單送出
 noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const newNote = {
         id: Date.now().toString(),
         title: document.getElementById('newTitle').value.trim(),
         category: document.getElementById('newCategory').value,
-        tag: document.getElementById('newTag').value.trim(),
-        content: $('#newEditor').summernote('code') // 取得 Summernote 內容
+        content: $('#newEditor').summernote('code')
     };
 
     saveNote(newNote);
     noteForm.reset();
-    $('#newEditor').summernote('code', ''); // 清空編輯器
+    $('#newEditor').summernote('code', '');
     document.querySelector('.form-section details').removeAttribute('open');
     loadNotes();
 });
 
-// 編輯 Modal 提交
 editForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const updatedNote = {
         id: editIdInput.value,
         title: editTitleInput.value.trim(),
         category: editCategorySelect.value,
-        tag: editTagInput.value.trim(),
         content: $('#editEditor').summernote('code')
     };
 
@@ -225,8 +222,7 @@ function openEditModal(id) {
     editIdInput.value = note.id;
     editTitleInput.value = note.title;
     editCategorySelect.value = note.category;
-    editTagInput.value = note.tag;
-    $('#editEditor').summernote('code', note.content); // 載入內容
+    $('#editEditor').summernote('code', note.content);
 
     editModal.classList.add('active');
 }
@@ -235,7 +231,6 @@ function closeEditModal() {
     editModal.classList.remove('active');
 }
 
-// LocalStorage 管理
 function initStorage() {
     if (!localStorage.getItem('ipas_notes')) {
         localStorage.setItem('ipas_notes', JSON.stringify(defaultNotes));
@@ -265,7 +260,6 @@ function deleteNote(id) {
     localStorage.setItem('ipas_notes', JSON.stringify(notes));
 }
 
-// 渲染卡片
 function renderCards(notesToRender) {
     cardContainer.innerHTML = '';
     const term = searchInput.value.toLowerCase().trim();
@@ -280,7 +274,7 @@ function renderCards(notesToRender) {
     });
 
     if (filtered.length === 0) {
-        cardContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px;">沒有找到相關的筆記內容</p>';
+        cardContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 50px; font-size: 1.15rem;">沒有找到相關的筆記內容</p>';
         return;
     }
 
@@ -299,10 +293,12 @@ function renderCards(notesToRender) {
             </div>
         ` : '<div></div>';
 
+        const categoryText = categoryNames[note.category] || '綜合筆記';
+
         card.innerHTML = `
             <div class="card-header">
+                <span class="category-badge">${categoryText}</span>
                 <h3>${escapeHTML(note.title)}</h3>
-                <span class="tag">${escapeHTML(note.tag)}</span>
             </div>
             <div class="card-body">
                 ${note.content}
@@ -310,7 +306,7 @@ function renderCards(notesToRender) {
             <button class="expand-btn">展開閱讀 ▼</button>
             <div class="card-footer">
                 ${adminActionsHTML}
-                <button class="copy-btn">複製重點</button>
+                <button class="copy-btn">複製內容</button>
             </div>
         `;
         cardContainer.appendChild(card);
